@@ -23,6 +23,7 @@ app.use("/api/account", require("./router/account"));
 app.use("/api/contact", require("./router/contact"));
 app.use("/api/admin", require("./router/admin"));
 app.use("/api/store", require("./router/store"));
+app.use("/api/appointment", require("./router/appointment"));
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);

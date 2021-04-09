@@ -14,10 +14,6 @@ const StoreSchema = new mongoose.Schema({
         required: [true, 'Store Email  is a must!'],
         unique: true
     },
-    password: {
-        type: String,
-        required: [true, 'Password is a must!']
-    },
     closingHours:{
         type: String,
         required:[true, "Closing Timing is must"]
@@ -34,14 +30,13 @@ const StoreSchema = new mongoose.Schema({
         type: Number,
         required:[true, "Slot Druation is must"]
     },
-    confirmed:{
-        type:Boolean,
-        required:[true, "Confirmation is must"]
-    
-    },
     slotsArray: {
         type: Array,
         required:[true, "Slots are must"]
+    },
+    confirmed: {
+        type: Boolean,
+        required:[true,"confirm required"]
     }
 })
 

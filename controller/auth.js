@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 const emailCheck = require("../middleware/nodemailer");
 const adminJwtSecretKey = process.env.ADMIN_JWT_SECRET_KEY;
+const Store = require("../model/storeModel")
 
 //Token Generator
 const createToken = (id) => jwt.sign({ id }, jwtSecretKey, { expiresIn: 3600 });
@@ -58,7 +59,12 @@ exports.signin = async (req, res) => {
 
 // Signup Area
 exports.signup = async (req, res) => {
-  const { firstName, lastName, email, pass } = req.body.data;
+  
+  const { firstName, lastName, email,confirmPassword, password} = req.body;
+  if(confirmPassword!=password) return  res.json({ status: "failed", message: "Both passwords dont match" })
+  
+  
+  let pass = password;
 
   let userCheck = await User.findOne({ email });
 
@@ -83,7 +89,7 @@ exports.signup = async (req, res) => {
     email,
     pass: hashedPass,
     confirmed: false,
-    admin: false,
+    storeOwner: false,
   });
   newUser.save(async (err, doc) => {
     if (err) res.status(500).json({ status: "failed", message: err });
@@ -96,7 +102,7 @@ exports.signup = async (req, res) => {
         expiresIn: 3600,
       });
 
-      doc.html = `<b>To Confirm your email address please <a href="http://localhost:4200/registration/confirmation/${doc.id}/${confirmationToken}/${doc.id}/${confirmationToken}">Click here!</a></b>`;
+      doc.html = `<b>To Confirm your email address please <a href="http://localhost:4200/account/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
       doc.subject = "Confirm your email";
       let emailStatus = await emailCheck.confirmation(doc);
       if (emailStatus)
@@ -184,22 +190,37 @@ exports.changePassword = async (req, res) => {
 };
 
 exports.confirmEmail = async (req, res) => {
-  const { token } = req.body;
+  const { token, id } = req.body.data;
+  let email;
 
   await jwt.verify(token, jwtSecretKey, async (fail, decodedPayload) => {
     if (fail)
       return res.json({
-        failed: "Authentication failed!",
+        status:"failed",
+        message: "Authentication failed in verifying token!",
       });
     else {
       let id = decodedPayload.id;
-      await User.findByIdAndUpdate(id, { confirmed: true }, (err, doc) => {
+      await User.findByIdAndUpdate(id, { confirmed: true }, async (err, doc) => {
         if (err)
-          res.json({ failed: "Your request is failed please try again" });
+          res.json({ status:"failed", message: "Your request is failed please try again" });
         else
-          res.json({
-            success: "You have successfuly confirmed your email address.",
+        {
+          if(doc.storeOwner==false) return res.json({
+              
+            status:"success",message: "You have successfuly confirmed your email address.",
           });
+          email = doc.email;
+          await Store.findOneAndUpdate({email}, { confirmed: true }, (err, doc) => {
+            if (err) res.json({ status: "failed", message: err })
+            else
+              res.json({
+              
+              status:"success",message: "You have successfuly confirmed your email address.",
+            });
+          })
+          }
+          
       });
     }
   });

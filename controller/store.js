@@ -1,14 +1,12 @@
 const Store = require("../model/storeModel");
-const path = require("path");
-const User = require("../model/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const jwtSecretKey = process.env.STORE_JWT_SECRET_KEY;
+const jwtSecretKey = process.env.JWT_SECRET_KEY;
 const emailCheck = require("../middleware/nodemailer");
-const { json } = require("body-parser");
-const adminJwtSecretKey = process.env.ADMIN_JWT_SECRET_KEY;
+const User= require("../model/userModel")
 
 exports.register = async (req, res) => {
+  let payLoadId;
     
     const {
         storeName,
@@ -32,23 +30,43 @@ exports.register = async (req, res) => {
         message: "Sorry! this email is already registered with us",
       });
     }
+    
+    let user = await User.findOne({ email });
   
-    let hashedPass = await bcrypt.hash(password, 10);
-    if (!hashedPass)
-      return res
-        .status(501)
-        .json({
-          status: "failed",
-          message: "Technical Erro 501, Please contact support team!",
-        });
-  let slotsArray = slotsGenerator(openingHours, closingHours, slotDuration, +personsPerSlot);
+    if (user) {
+      return res.json({
+        status: "already",
+        message: "Sorry! this email is already registered with us",
+      });
+  }
+  let hashedPass = await bcrypt.hash(password, 10);
+  if (!hashedPass)
+    return res
+      .status(501)
+      .json({
+        status: "failed",
+        message: "Technical Erro 501, Please contact support team!",
+      });
+  
+  const newUser = new User({
+    firstName:storeName,
+    lastName:"Store",
+    email,
+    pass: hashedPass,
+    confirmed: false,
+    storeOwner: true,
+  });
 
+  newUser.save(async (err, doc) => {
+    if (err) res.status(500).json({ status: "failed", message: err });
+    else {
+      payLoadId = doc._id;
+      let slotsArray = slotsGenerator(openingHours, closingHours, slotDuration, +personsPerSlot);
   
     const newStore = new Store({
       storeName,
       storeAddress,
       email,
-      password: hashedPass,
       confirmed: false,
       closingHours: ('0'+closingHours+'00').slice(-4),
       openingHours: ('0'+openingHours+'00').slice(-4),
@@ -60,14 +78,14 @@ exports.register = async (req, res) => {
       if (err) res.status(500).json({ status: "failed", message: err });
       else {
         const payload = {
-          id: doc._id,
+          id: payLoadId,
           email: doc.email,
         };
         const confirmationToken = await jwt.sign(payload, jwtSecretKey, {
           expiresIn: 3600,
         });
   
-        doc.html = `<b>To Confirm  email address of your store please <a href="http://localhost:4200/store/registration/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
+        doc.html = `<b>To Confirm  email address of your store please <a href="http://localhost:4200/account/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
         doc.subject = "Confirm your email";
         let emailStatus = await emailCheck.confirmation(doc);
         if (emailStatus)
@@ -82,6 +100,8 @@ exports.register = async (req, res) => {
           });
       }
     });
+  }
+});
 };
   
 slotsGenerator = (startTime, closeTime, slotDuration, capacity) => {
@@ -109,4 +129,31 @@ slotsGenerator = (startTime, closeTime, slotDuration, capacity) => {
   }
 
   return arrayOfSlots
+}
+
+
+////============================get Stores list============
+exports.getStores = (req, res) => {
+  Store.find({},{ _id:1, storeName:1 }, (err, doc) => {
+    if (err) res.json({ status: "failed", message: err })
+    else {
+      console.log(doc)
+      res.json({
+        status: "success",
+        message:doc
+      })
+    }
+  })
+}
+exports.storeSlots = async (req, res) => {
+  Store.findById({_id:req.body.id}, {slotsArray:1 }, (err, doc) => {
+      if (err) res.json({ status: "failed", message: err })
+      else {
+          res.json({
+            status: "success",
+            message:doc
+          })
+      }
+  })
+
 }
