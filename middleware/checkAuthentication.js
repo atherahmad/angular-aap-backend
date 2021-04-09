@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken")
 const jwtSecretKey= process.env.JWT_SECRET_KEY
 
-exports.checkToken =(req,res, next)=>{
-    const token = req.header("x-auth-token")
+exports.checkToken = (req, res, next) => {
+    const token = req.headers.authorization;
 
     if(!token) return res.json({
         status:"failed",
