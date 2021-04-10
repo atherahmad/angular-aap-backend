@@ -16,6 +16,14 @@ const AppointmentSchema = new mongoose.Schema({
     creatorId:{
         type: String,
         required:[true, "Creator Id is must"]
+    },
+    storeName: {
+        type: String,
+        required: [true, 'Store name is must']
+    },
+    slotName: {
+        type: String,
+        require:[true,"Slot name required"]
     }
 })
 

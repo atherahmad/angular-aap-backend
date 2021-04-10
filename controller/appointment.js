@@ -17,20 +17,26 @@ exports.newAppointment = async (req, res) => {
         selectedYear,
         selectedMonth,
         selectedDay,
-        selectedStore,        
-    } = req.body;
+        selectedStore,
+        storeName,
+        slotName
+  } = req.body;
+  
 
     const creator = req.userId;
     
-    console.log(slotNumber, selectedDay, selectedMonth, selectedYear, selectedStore, creator, "appointment")
+    console.log(slotNumber, selectedDay, selectedMonth, selectedYear, selectedStore, creator,storeName,slotName, "appointment")
     let appointmentDate = `${selectedDay}/${selectedMonth}/${selectedYear}`;
     console.log(appointmentDate, "date in appointments")
     
        const newAppointment = new Appointment({
-           storeId: selectedStore,
-           appoointmentSlot: slotNumber,
-           creatorId: creator,
-           appointmentDate
+          storeId: selectedStore,
+          appoointmentSlot: slotNumber,
+          creatorId: creator,
+          appointmentDate,
+          storeName,
+          slotName
+           
       });
       newAppointment.save((err, doc) => {
         if (err) {
