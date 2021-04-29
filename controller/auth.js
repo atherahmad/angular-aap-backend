@@ -32,14 +32,14 @@ exports.signin = async (req, res) => {
     bcrypt.compare(pass, result.pass).then(async (isPassCorrect) => {
       if (isPassCorrect) {
         if (result.confirmed) {
-          const { id, firstName, lastName, liked, email, admin } = result;
+          const { id, firstName, lastName, email, storeOwner } = result;
           let token = "";
           if (admin) token = await createAdminToken(result.id);
           else token = await createToken(result.id);
           res.json({
             status: "success",
             message: "Welcome! you are successfully logged in. ",
-            data: { id, firstName, lastName, liked, email, admin },
+            data: { id, firstName, lastName, email, storeOwner },
             token,
           });
         } else
@@ -119,22 +119,22 @@ exports.signup = async (req, res) => {
   });
 };
 //Checking Authentication of user
-
 exports.authenticated = async (req, res) => {
   await User.findById(
     req.userId,
-    { _id: 1, firstName: 1, liked: 1, email: 1, admin: 1 },
+    { _id: 1, firstName: 1, lastName: 1, },
     (err, doc) => {
       if (err)
         return res.json({
           status: "failed",
           message: "Unable to retrieve your data please try again",
         });
-
+      
+      const { id, firstName, lastName, email, storeOwner } = doc;
       res.json({
         status: "success",
-        message: "You have been authorized",
-        data: doc,
+        message: "Welcome! you are successfully logged in.",
+        data: { id, firstName, lastName, email, storeOwner },
       });
     }
   );
