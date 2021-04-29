@@ -34,7 +34,7 @@ exports.signin = async (req, res) => {
         if (result.confirmed) {
           const { id, firstName, lastName, email, storeOwner } = result;
           let token = "";
-          if (admin) token = await createAdminToken(result.id);
+          if (storeOwner) token = await createAdminToken(result.id);
           else token = await createToken(result.id);
           res.json({
             status: "success",

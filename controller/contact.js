@@ -2,7 +2,7 @@ const Querry = require("../model/querriesModel")
 const emailCheck = require("../middleware/nodemailer")
 
 exports.querry = async (req, res) => {
-    console.log(req.body.data)
+
         const newQuerry = new Querry({
             name:req.body.data.name,
             email:req.body.data.email,
@@ -28,9 +28,9 @@ exports.querry = async (req, res) => {
             ==========================================================================
             <br/>
             Your querry
-            <h4>Subject: ${req.body.subject}</h4>
+            <h4>Subject: ${req.body.data.subject}</h4>
             <h4>Message:</h4>
-            <p>${req.body.messageText}</p>`
+            <p>${req.body.data.message}</p>`
     })
                 if (querry) res.json({ status:"success", message: "We have recieved your querry"})
         else res.json({status:"failed", message:"Sorry we are unable to proccess your request please try again later"})
