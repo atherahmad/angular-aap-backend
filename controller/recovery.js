@@ -38,7 +38,7 @@ exports.resetLink = async (req, res) => {
         email: userCheck.email,
         subject: "Reset Password at c2c",
         text: "",
-        html: `<b>To Change your passowrd please <a href="https://angular-appointment-app.herokuapp.com/resetpassword/${payload.id}/${resetToken}">Click here!</a></b>`,
+        html: `<b>To Change your passowrd please <a href="https://angular-appointment-app.herokuapp.com/#/resetpassword/${payload.id}/${resetToken}">Click here!</a></b>`,
       });
       if (resetLinkSent)
         res.json({
