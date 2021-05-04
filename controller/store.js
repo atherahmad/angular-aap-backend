@@ -85,7 +85,7 @@ exports.register = async (req, res) => {
           expiresIn: 3600,
         });
   
-        doc.html = `<b>To Confirm  email address of your store please <a href="http://localhost:4200/account/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
+        doc.html = `<b>To Confirm  email address of your store please <a href="https://angular-appointment-app.herokuapp.com/#/account/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
         doc.subject = "Confirm your email";
         let emailStatus = await emailCheck.confirmation(doc);
         if (emailStatus)
