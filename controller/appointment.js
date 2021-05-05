@@ -11,7 +11,6 @@ const adminJwtSecretKey = process.env.ADMIN_JWT_SECRET_KEY;
 
 
 exports.newAppointment = async (req, res) => {
-    console.log(req.body);
     const {
         slotNumber,
         selectedYear,
@@ -27,7 +26,6 @@ exports.newAppointment = async (req, res) => {
     
     console.log(slotNumber, selectedDay, selectedMonth, selectedYear, selectedStore, creator,storeName,slotName, "appointment")
     let appointmentDate = `${selectedDay}/${selectedMonth}/${selectedYear}`;
-    console.log(appointmentDate, "date in appointments")
     
        const newAppointment = new Appointment({
           storeId: selectedStore,
@@ -47,3 +45,22 @@ exports.newAppointment = async (req, res) => {
         }
       }); 
     };
+
+exports.deleteAppointment = async (req, res) => {
+
+  const appointmentId = req.body.appointmentId;
+  console.log(req.body, "in delete appointment");
+
+  await Appointment.findByIdAndDelete(appointmentId, (err, result) => {
+    if (err) res.json({
+      status: "failed",
+      message:
+        "Sorry, we are unable to process your request please try again",
+    });
+    else res.json({
+      status: "success",
+      message:"You have successfully deleted the targeted Appointment"
+    })
+      })
+    
+  }

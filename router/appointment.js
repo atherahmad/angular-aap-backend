@@ -7,6 +7,10 @@ router.post(
   "/new",auth.checkToken,
 appointment.newAppointment
 );
+router.post(
+  "/delete",auth.checkToken,
+appointment.deleteAppointment
+);
 
 
 module.exports = router;
