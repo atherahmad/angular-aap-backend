@@ -137,7 +137,6 @@ exports.getStores = (req, res) => {
   Store.find({},{ _id:1, storeName:1 }, (err, doc) => {
     if (err) res.json({ status: "failed", message: err })
     else {
-      console.log(doc)
       res.json({
         status: "success",
         message:doc

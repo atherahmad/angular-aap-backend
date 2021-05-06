@@ -1,5 +1,6 @@
 const Store = require("../model/storeModel");
-const Appointment= require("../model/appointmentModel")
+const Appointment = require("../model/appointmentModel")
+const CancelledAppointment=require("../model/cancelledAppointmentModel")
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -46,10 +47,10 @@ exports.newAppointment = async (req, res) => {
       }); 
     };
 
+
 exports.deleteAppointment = async (req, res) => {
 
   const appointmentId = req.body.appointmentId;
-  console.log(req.body, "in delete appointment");
 
   await Appointment.findByIdAndDelete(appointmentId, (err, result) => {
     if (err) res.json({
@@ -57,10 +58,17 @@ exports.deleteAppointment = async (req, res) => {
       message:
         "Sorry, we are unable to process your request please try again",
     });
-    else res.json({
-      status: "success",
-      message:"You have successfully deleted the targeted Appointment"
-    })
+    else
+      console.log("result ", result)
+      result=result.toObject()
+      result.cancelledByUser=true;
+      result.cancelledByStore=false;
+      let swap = new CancelledAppointment(result)
+    swap.save((err, doc => {
+      if (err) res.json({ status: "failed", message: "Unable to process your request please try again." })
+        else res.json({status:"success", message:"You have successfully deleted your appointment"})
+      }))
+
       })
     
   }

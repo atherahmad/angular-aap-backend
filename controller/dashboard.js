@@ -1,4 +1,6 @@
-const Appointment= require("../model/appointmentModel")
+const Appointment = require("../model/appointmentModel");
+const CancelledAppointment = require("../model/cancelledAppointmentModel");
+
 
 
 exports.myAppointments = async (req, res) => {
@@ -10,4 +12,12 @@ exports.myAppointments = async (req, res) => {
 
     })
     
+}
+
+exports.getDeletedAppointments = async (req, res) => {
+    const creator = req.userId;
+    await CancelledAppointment.find({ creatorId: creator }, (err, doc) => {
+        if (err) return res.json({ status: "failed", message: "Unable to proccess your request please try again" })
+        res.json({ status: "success", message: doc })
+    })
 }
