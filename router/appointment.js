@@ -11,6 +11,9 @@ router.post(
   "/delete",auth.checkToken,
 appointment.deleteAppointment
 );
-
+router.get(
+  "/details/:id",auth.checkToken,
+appointment.appoinmetnDetails
+);
 
 module.exports = router;

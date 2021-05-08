@@ -71,4 +71,16 @@ exports.deleteAppointment = async (req, res) => {
 
       })
     
-  }
+}
+  
+exports.appoinmetnDetails = async (req, res) => {
+  const id = req.params.id;
+  console.log(id)
+  Appointment.findById(id, (err, doc) => {
+    if (err)  res.json({ status: "failed", message: "Unable to process your request please try again" })
+    else {
+      console.log(doc)
+      res.json({ status: "success", message: doc })
+    }
+  })
+}
