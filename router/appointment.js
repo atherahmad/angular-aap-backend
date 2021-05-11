@@ -15,5 +15,6 @@ router.get(
   "/details/:id",auth.checkToken,
 appointment.appoinmetnDetails
 );
+router.post("/update", auth.checkToken,appointment.updateAppointment )
 
 module.exports = router;

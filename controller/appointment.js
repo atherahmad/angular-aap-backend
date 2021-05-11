@@ -51,23 +51,29 @@ exports.newAppointment = async (req, res) => {
 exports.deleteAppointment = async (req, res) => {
 
   const appointmentId = req.body.appointmentId;
+  console.log(appointmentId, "appointment id in delete")
 
-  await Appointment.findByIdAndDelete(appointmentId, (err, result) => {
-    if (err) res.json({
-      status: "failed",
-      message:
-        "Sorry, we are unable to process your request please try again",
-    });
-    else
-      console.log("result ", result)
-      result=result.toObject()
+  await Appointment.findByIdAndDelete({_id:appointmentId}, async(err, result) => {
+    
+    if(result)
+    {
+      console.log("result ", result);
+      result = result.toObject() ;
       result.cancelledByUser=true;
       result.cancelledByStore=false;
       let swap = new CancelledAppointment(result)
-    swap.save((err, doc => {
+      await swap.save((err, doc => {
       if (err) res.json({ status: "failed", message: "Unable to process your request please try again." })
         else res.json({status:"success", message:"You have successfully deleted your appointment"})
       }))
+    }
+    else {
+      console.log(err)
+      res.json({
+      status: "failed",
+      message:
+        "Sorry, we are unable to process your request please try again",
+    });}
 
       })
     
@@ -83,4 +89,23 @@ exports.appoinmetnDetails = async (req, res) => {
       res.json({ status: "success", message: doc })
     }
   })
+}
+
+exports.updateAppointment = async (req, res) => {
+  const { _id, appointmentDate, appoointmentSlot,slotName } = req.body
+  Appointment.findByIdAndUpdate(_id, { appointmentDate, appoointmentSlot,slotName }, (err, doc) => {
+    if (err) {
+      res.json({
+        status: "failed",
+        message:"Your request for updation failed, please try again."
+      })
+    }
+    else {
+      res.json({
+        status: "success",
+        message:"You have successfuly updated the Appointment"
+      })
+    }
+  })
+  
 }
