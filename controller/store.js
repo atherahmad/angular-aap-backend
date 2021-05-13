@@ -134,7 +134,7 @@ slotsGenerator = (startTime, closeTime, slotDuration, capacity) => {
 
 ////============================get Stores list============
 exports.getStores = (req, res) => {
-  Store.find({},{ _id:1, storeName:1 }, (err, doc) => {
+  Store.find({},{ _id:1, storeName:1, personsPerSlot:1 }, (err, doc) => {
     if (err) res.json({ status: "failed", message: err })
     else {
       res.json({

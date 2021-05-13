@@ -9,6 +9,7 @@ const emailCheck = require("../middleware/nodemailer");
 const { json } = require("body-parser");
 const { response } = require("express");
 const adminJwtSecretKey = process.env.ADMIN_JWT_SECRET_KEY;
+const AvailableAppointments=require("../model/availableAppointments")
 
 
 exports.newAppointment = async (req, res) => {
@@ -19,33 +20,56 @@ exports.newAppointment = async (req, res) => {
         selectedDay,
         selectedStore,
         storeName,
-        slotName
+        slotName,
+        personsPerSlot
   } = req.body;
   
 
     const creator = req.userId;
     
-    console.log(slotNumber, selectedDay, selectedMonth, selectedYear, selectedStore, creator,storeName,slotName, "appointment")
-    let appointmentDate = `${selectedDay}/${selectedMonth}/${selectedYear}`;
+  let appointmentDate = `${selectedDay}/${selectedMonth}/${selectedYear}`;
+  
+  const newAppointment = new Appointment({
+    storeId: selectedStore,
+    appoointmentSlot: slotNumber,
+    creatorId: creator,
+    appointmentDate,
+    storeName,
+    slotName
     
-       const newAppointment = new Appointment({
-          storeId: selectedStore,
-          appoointmentSlot: slotNumber,
-          creatorId: creator,
-          appointmentDate,
-          storeName,
-          slotName
-           
-      });
-      newAppointment.save((err, doc) => {
-        if (err) {
-          res.json({ status: "failed", message: err });
-        } else {
-         
-            res.json({ status: "success", message: "Appointment successfully created" });
-        }
-      }); 
-    };
+  });
+  AvailableAppointments.find({ storeId:selectedStore, appointmentDate }, (err, doc) => {
+    if (err) res.json({
+      status: "failed",
+      message:err
+    })
+    else {
+      if(doc.length==0){
+     const AppointmentLimit = new AvailableAppointments({
+        storeId:selectedStore,
+       appointmentDate,
+       availableAppointments:[{slotNumber,remaining:personsPerSlot-1}]
+     })
+        AppointmentLimit.save((err, doc) => {
+          if (err) res.json({
+            status: "failed",
+            message:err
+          })
+          else {
+            newAppointment.save((err, doc) => {
+              if (err) {
+                res.json({ status: "failed", message: err });
+              } else {
+               
+                  res.json({ status: "success", message: "Appointment successfully created" });
+              }
+            }); 
+          }
+      })}
+    }
+  })
+      
+  };
 
 
 exports.deleteAppointment = async (req, res) => {

@@ -5,18 +5,22 @@ const AppointmentSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Store Id is a must!']
     },
-    appointmentDate:{
-        type:String,
+    appointmentDate: {
+        type: String,
         required: [true, 'Date is a must!']
     },
     appoointmentSlot: {
         type: Number,
         required: [true, 'Appointment slot is a must!'],
     },
-    creatorId:{
+    creatorId: {
         type: String,
-        required:[true, "Creator Id is must"]
+        required: [true, "Creator Id is must"]
     },
+ /*    appointmentHolder: {
+        type: String,
+        required: [true, 'User name is must']
+}, */
     storeName: {
         type: String,
         required: [true, 'Store name is must']

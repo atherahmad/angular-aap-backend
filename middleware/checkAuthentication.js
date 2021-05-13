@@ -15,7 +15,7 @@ exports.checkToken = (req, res, next) => {
                 message:"Authentication failed!"
             }) 
             else {
-                req.userId =decodedPayload.id;
+                req.userId = decodedPayload.id;
                 next();
             }
         })
