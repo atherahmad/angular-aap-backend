@@ -137,7 +137,7 @@ exports.signup = async (req, res) => {
         expiresIn: 3600,
       });
 
-      doc.html = `<b>To Confirm your email address please <a href="https://angular-appointment-app.herokuapp.com/#/account/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
+      doc.html = `<b>To Confirm your email address please <a href="${process.env.FE_URL}/#/account/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
       doc.subject = "Confirm your email";
       let emailStatus = await emailCheck.confirmation(doc);
       if (emailStatus)
@@ -155,7 +155,7 @@ exports.signup = async (req, res) => {
 };
 //Checking Authentication of user
 exports.authenticated = async (req, res) => {
-  await User.findById(
+   User.findById(
     req.userId,
     { _id: 1, firstName: 1, lastName: 1, },
     (err, doc) => {
@@ -206,10 +206,10 @@ exports.changePassword = async (req, res) => {
       if (isPassCorrect) {
         let hashedPass = await bcrypt.hash(pass, 10);
         const profileData = { pass: hashedPass };
-        await User.findByIdAndUpdate(
+        User.findByIdAndUpdate(
           req.userId,
           profileData,
-          async (err, doc) => {
+           (err, doc) => {
             if (err) return res.json({ status: "failed", message: err });
             else {
               res.json({
@@ -225,8 +225,8 @@ exports.changePassword = async (req, res) => {
 };
 
 exports.confirmEmail = async (req, res) => {
-  console.log(req.params, "in confirm")
-  const { token, id } = req.params
+  const { token, id } = req.body.data
+  console.log("reached confirm")
   let email;
 
   await jwt.verify(token, jwtSecretKey, async (fail, decodedPayload) => {
@@ -237,17 +237,19 @@ exports.confirmEmail = async (req, res) => {
       });
     else {
       let id = decodedPayload.id;
-      await User.findByIdAndUpdate(id, { confirmed: true }, async (err, doc) => {
+       User.findByIdAndUpdate(id, { confirmed: true },  (err, doc) => {
         if (err)
-          res.json({ status:"failed", message: "Your request is failed please try again" });
+          {
+            console.log("error occured", err)
+            res.json({ status:"failed", message: "Your request is failed please try again" });}
         else
         {
-          if(doc.storeOwner==false) return res.json({
+          if(!doc.storeOwner) return res.json({
               
             status:"success",message: "You have successfuly confirmed your email address.",
           });
           email = doc.email;
-          await Store.findOneAndUpdate({email}, { confirmed: true }, (err, doc) => {
+           Store.findOneAndUpdate({email}, { confirmed: true }, (err, doc) => {
             if (err) res.json({ status: "failed", message: err })
             else
               res.json({

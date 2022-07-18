@@ -10,7 +10,7 @@ exports.querry = async (req, res) => {
             message:req.body.data.message,
             completed:false})
             
-        await newQuerry.save(async(err,doc)=>{
+         newQuerry.save(async(err,doc)=>{
             if(err) {
                 res.json({status:"failed", message:"Currently unable to send your meesage please try again", data:err})
                 throw err

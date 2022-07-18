@@ -77,7 +77,7 @@ exports.deleteAppointment = async (req, res) => {
   const appointmentId = req.body.appointmentId;
   console.log(appointmentId, "appointment id in delete")
 
-  await Appointment.findByIdAndDelete({_id:appointmentId}, async(err, result) => {
+   Appointment.findByIdAndDelete({_id:appointmentId}, async(err, result) => {
     
     if(result)
     {
@@ -86,7 +86,7 @@ exports.deleteAppointment = async (req, res) => {
       result.cancelledByUser=true;
       result.cancelledByStore=false;
       let swap = new CancelledAppointment(result)
-      await swap.save((err, doc => {
+       swap.save((err, doc => {
       if (err) res.json({ status: "failed", message: "Unable to process your request please try again." })
         else res.json({status:"success", message:"You have successfully deleted your appointment"})
       }))

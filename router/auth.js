@@ -4,7 +4,7 @@ const tokenAuth = require("../middleware/checkAuthentication")
 
 router.post("/signin",      auth.signin)
 router.post("/signup",      auth.signup)
-router.get("/confirm/:token/:id",     auth.confirmEmail)
+router.post("/confirm",     auth.confirmEmail)
 router.get("/authenticated",tokenAuth.checkToken,auth.authenticated)
 router.post("/changepassword", tokenAuth.checkToken, auth.changePassword)
 

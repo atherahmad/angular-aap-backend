@@ -81,11 +81,11 @@ exports.register = async (req, res) => {
           id: payLoadId,
           email: doc.email,
         };
-        const confirmationToken = await jwt.sign(payload, jwtSecretKey, {
+        const confirmationToken =  jwt.sign(payload, jwtSecretKey, {
           expiresIn: 3600,
         });
   
-        doc.html = `<b>To Confirm  email address of your store please <a href="https://angular-appointment-app.herokuapp.com/#/account/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
+        doc.html = `<b>To Confirm  email address of your store please <a href="${process.env.FE_URL}/#/account/confirmation/${doc.id}/${confirmationToken}">Click here!</a></b>`;
         doc.subject = "Confirm your email";
         let emailStatus = await emailCheck.confirmation(doc);
         if (emailStatus)

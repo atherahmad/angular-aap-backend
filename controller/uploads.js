@@ -51,7 +51,7 @@ exports.profile = async (req, res) => {
       },
     };
 
-  await User.findByIdAndUpdate(req.userId, profileData, (err, doc) => {
+   User.findByIdAndUpdate(req.userId, profileData, (err, doc) => {
     if (err) res.json({ status: "failed", message: err });
     else
       res.json({

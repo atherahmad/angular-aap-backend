@@ -38,7 +38,7 @@ exports.resetLink = async (req, res) => {
         email: userCheck.email,
         subject: "Reset Password at c2c",
         text: "",
-        html: `<b>To Change your passowrd please <a href="https://angular-appointment-app.herokuapp.com/#/resetpassword/${payload.id}/${resetToken}">Click here!</a></b>`,
+        html: `<b>To Change your passowrd please <a href="${process.env.FE_URL}/#/resetpassword/${payload.id}/${resetToken}">Click here!</a></b>`,
       });
       if (resetLinkSent)
         res.json({
@@ -115,10 +115,10 @@ exports.resetPassword = async (req, res) => {
     pass: hashedPass,
   };
 
-  await User.findByIdAndUpdate(id, profileData, async (err, doc) => {
+   User.findByIdAndUpdate(id, profileData, async (err, doc) => {
     if (err) return res.json({ status: "failed", message: err });
     else {
-      await PassRecovery.findOneAndUpdate(
+   PassRecovery.findOneAndUpdate(
         { tokenId: token },
         { recovered: true },
         (err, doc) => {
