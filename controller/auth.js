@@ -15,7 +15,42 @@ const createAdminToken = (id) =>
 //Sign in  Area
 exports.signin = async (req, res) => {
   const { email, pass } = req.body.data;
-  await User.findOne({ email }, (err, result) => {
+  console.log("sign in ", email, pass)
+
+  const user = await User.findOne({email})
+  if(!user) return res.json("failed")
+
+  console.log(user)
+  await bcrypt.compare(pass, user.pass).then(async (isPassCorrect) => {
+    if (isPassCorrect) {
+      if (user.confirmed) {
+        const { id, firstName, lastName, email, storeOwner } = user;
+        let token = "";
+        if (storeOwner) token = await createAdminToken(user.id);
+        else token = await createToken(user.id);
+        res.json({
+          status: "success",
+          message: "Welcome! you are successfully logged in. ",
+          data: { id, firstName, lastName, email, storeOwner },
+          token,
+        });
+      } else
+        res.json({
+          status: "failed",
+          message:
+            "Authentication failed, please confirm you email address first",
+        });
+    } else
+      res.json({
+        status: "failed",
+        message: "Authorization failed , please check your credentials",
+      });
+  });
+}
+
+
+/*   await User.findOne({ email }, (err, result) => {
+  console.log("err and result", err, result)
     if (err)
       return res.status(500).json({
         status: "failed",
@@ -54,8 +89,8 @@ exports.signin = async (req, res) => {
           message: "Authorization failed , please check your credentials",
         });
     });
-  });
-};
+  }); */
+
 
 // Signup Area
 exports.signup = async (req, res) => {
@@ -190,7 +225,8 @@ exports.changePassword = async (req, res) => {
 };
 
 exports.confirmEmail = async (req, res) => {
-  const { token, id } = req.body.data;
+  console.log(req.params, "in confirm")
+  const { token, id } = req.params
   let email;
 
   await jwt.verify(token, jwtSecretKey, async (fail, decodedPayload) => {
@@ -220,7 +256,6 @@ exports.confirmEmail = async (req, res) => {
             });
           })
           }
-          
       });
     }
   });

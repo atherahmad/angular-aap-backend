@@ -30,6 +30,7 @@ exports.confirmation = async(doc)=>{
 const sgMail = require('@sendgrid/mail');
 
 exports.confirmation = async(doc)=>{
+  console.log("doc in sendemail",doc)
   const {email, subject, text,html} = doc
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
